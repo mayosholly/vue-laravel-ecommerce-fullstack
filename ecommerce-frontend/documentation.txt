@@ -1,0 +1,1001 @@
+Part 3: Building the Frontend with Vue.js.
+Step 1: Create a Vue.js Project
+First, let’s create a new Vue.js project. Make sure you have Node.js and npm installed. Then, use the Vue CLI to create a new project:
+
+To install Vue CLI via npm, first, make sure you have Node.js and npm installed. You can check if Node.js and npm are installed by running:
+
+node -v
+npm -v
+PHP
+
+If they are not installed, you can download and install Node.js from the official website or use a package manager.
+
+Once you have Node.js and npm installed, you can install the Vue CLI globally by running:
+
+npm install -g @vue/cli
+PHP
+
+The -g flag installs the package globally, making the vue command available system-wide.
+
+Now, the vue command should be available. You can check the version of the Vue CLI installed by running:
+
+vue --version
+PHP
+
+After installing the Vue CLI, you can create a new Vue.js project by running:
+
+vue create ecommerce-frontend
+PHP
+
+Navigate into the project directory:
+
+cd ecommerce-frontend 
+PHP
+
+This will start the project creation process. Follow the prompts and select the features you need for your project.
+
+“Alright, now we are presented with a few options for setting up our Vue.js project. Since we want to use the latest version of Vue, which is Vue.js 3, we should choose the first option ‘Default ([Vue 3] babel, eslint)’. This preset includes Vue 3, and also sets up Babel and ESLint for us. Babel is a JavaScript compiler that lets us use the latest JavaScript features, and ESLint is a tool for identifying and fixing problems in our JavaScript code. These tools are quite helpful and are common in modern JavaScript development. So, let’s go ahead and select the first option and hit enter.”
+
+At this point, you can use the arrow keys to highlight the “Default ([Vue 3] babel, eslint)” option and then press the Enter key to continue with the setup.
+
+Step 2: Install Axios
+We’ll use Axios to make HTTP requests to our Laravel API. Install it via npm:
+
+npm install axios
+PHP
+
+Let’s establish a base URL for our Axios API endpoints…
+
+Create a file called `..src/axios.js`
+
+import axios from 'axios';
+const instance = axios.create({
+baseURL: 'http://localhost:8000/api'
+});
+
+
+export default instance;
+PHP
+
+Step 3: Create Components
+Inside your Vue.js project, let’s create different components for different functionalities. Create the following components inside the src/components directory:
+
+ProductList.vue (to list all products)
+ProductDetails.vue (to view details of a single product)
+AddProduct.vue (to add a new product)
+EditProduct.vue (to edit an existing product)
+Step 4: Create Login and Registration Components
+Inside your Vue.js project, let’s create different components for different functionalities. Create the following components inside the src/components directory:
+
+..src/components/Login.vue
+
+<template>
+<!-- Form for login -->
+<div class="form-container">
+<form @submit.prevent="login" class="login-form">
+<!-- Email and password inputs -->
+<input type="email" v-model="email" placeholder="Email" required />
+<input type="password" v-model="password" placeholder="Password" required />
+<!-- Submit button -->
+<button type="submit">Login</button>
+</form>
+</div>
+</template>
+
+
+<script>
+import axios from '@/axios';
+
+
+export default {
+data() {
+return {
+// Data model for the form inputs
+email: "",
+password: ""
+};
+},
+methods: {
+async login() {
+try {
+// Making POST request to "/login" endpoint with email and password as data
+const response = await axios.post("/login", {
+email: this.email,
+password: this.password
+});
+
+
+// If a token is received, it's stored in local storage and the user is considered logged in
+if (response.data.token) {
+localStorage.setItem('token', response.data.token);
+
+
+// Committing a mutation to update 'isLoggedIn' state
+this.$store.commit('LOGIN');
+
+
+// Redirecting to the home page
+this.$router.push('/');
+}
+} catch (error) {
+console.error("An error occurred:", error);
+}
+}
+}
+};
+</script>
+
+
+
+<style scoped>
+.form-container {
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+
+.login-form {
+display: flex;
+flex-direction: column;
+gap: 20px;
+width: 300px;
+padding: 20px;
+border-radius: 5px;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.login-form input, .login-form button {
+padding: 10px;
+border-radius: 5px;
+border: 1px solid #ccc;
+font-size: 16px;
+}
+
+
+.login-form button {
+background-color: #007BFF;
+color: white;
+cursor: pointer;
+}
+</style>
+JavaScript
+
+..src/components/Register.vue
+<template>
+<!-- Form for registration -->
+<div class="form-container">
+<form @submit.prevent="register" class="register-form">
+<!-- Name, email, and password inputs -->
+<input type="text" v-model="name" placeholder="Name" required />
+<input type="email" v-model="email" placeholder="Email" required />
+<input type="password" v-model="password" placeholder="Password" required />
+<!-- Submit button -->
+<button type="submit">Register</button>
+</form>
+</div>
+</template>
+
+
+<script>
+import axios from '@/axios';
+
+
+export default {
+data() {
+return {
+// Data model for the form inputs
+name: "",
+email: "",
+password: ""
+};
+},
+methods: {
+async register() {
+try {
+// Making POST request to "/register" endpoint with name, email, and password as data
+const response = await axios.post("/register", {
+name: this.name,
+email: this.email,
+password: this.password
+});
+// Here you could handle the response, for example, store the received token,
+// update the 'isLoggedIn' state, and redirect to the dashboard or any other page
+}
+catch (error) {
+console.error("An error occurred:", error);
+if (error.response) {
+console.error('Error details:', error.response.data);
+}
+}
+}
+}
+};
+</script>
+
+
+
+<style scoped>
+.form-container {
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+
+.register-form {
+display: flex;
+flex-direction: column;
+gap: 20px;
+width: 300px;
+padding: 20px;
+border-radius: 5px;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.register-form input, .register-form button {
+padding: 10px;
+border-radius: 5px;
+border: 1px solid #ccc;
+font-size: 16px;
+}
+
+
+.register-form button {
+background-color: #007BFF;
+color: white;
+cursor: pointer;
+}
+</style>
+JavaScript
+
+Step 5: Set Up Vue Router
+Install and set up Vue Router to navigate between different components:
+
+npm install vue-router@next
+JavaScript
+
+Create a router.js file in the src directory and set up routes for different components.
+
+.src/router.js
+
+import { createRouter, createWebHistory } from 'vue-router';
+
+
+import ProductList from './components/ProductList.vue';
+import ProductDetails from './components/ProductDetails.vue';
+import AddProduct from './components/AddProduct.vue';
+import EditProduct from './components/EditProduct.vue';
+import Login from './components/Login.vue'; // Import the Login component
+import Register from './components/Register.vue'; // Import the Register component
+
+
+const routes = [
+{
+path: '/',
+name: 'ProductList',
+component: ProductList,
+meta: { public: false } // Mark this route as private
+},
+{
+path: '/product/:id',
+name: 'ProductDetails',
+component: ProductDetails,
+meta: { public: false } // Mark this route as private
+},
+{
+path: '/add-product',
+name: 'AddProduct',
+component: AddProduct,
+meta: { public: false } // Mark this route as private
+},
+{
+path: '/edit-product/:id',
+name: 'EditProduct',
+component: EditProduct,
+meta: { public: false } // Mark this route as private
+},
+{
+path: '/login', // Add this route
+name: 'Login',
+component: Login,
+meta: { public: true } // Mark this route as public
+},
+{
+path: '/register', // Add this route
+name: 'Register',
+component: Register,
+meta: { public: true } // Mark this route as public
+}
+];
+
+
+const router = createRouter({
+history: createWebHistory(),
+routes,
+});
+
+
+
+router.beforeEach((to, from, next) => {
+// Check if the user is authenticated (e.g., check if a token is stored)
+const isAuthenticated = !!localStorage.getItem('token');
+
+
+if (!to.meta.public && !isAuthenticated) {
+// If the route is not public and the user is not authenticated, redirect to login
+next({ name: 'Login' });
+} else {
+// Otherwise, allow navigation
+next();
+}
+});
+
+
+export default router;
+JavaScript
+
+
+Now, if you log out and try to access the private routes directly from the address bar, you should be redirected to the login page.
+
+Step 6: Create a Store.js file
+Create a central Vuex store to handle the authentication state of your application. This will allow you to check whether the user is logged in from any component, including your Navbar.
+
+Before you create the store.js file, you need to install Vuex in your project. Vuex is the official state management library for Vue.js.
+
+
+
+If you are using npm, you can install Vuex by running the following command in your terminal:
+
+npm install vuex@next
+JavaScript
+
+For those using yarn:
+
+yarn add vuex@next
+JavaScript
+
+Once Vuex is installed, you can create a new file store.js and include the content below.
+
+`.src/store.js`
+
+// Importing required modules
+import { createStore } from 'vuex' // Vuex's createStore function to create a store
+import router from './router'; // Importing router to control routing in actions
+
+
+// Creating a Vuex store
+export default createStore({
+// State object contains all the reactive data that we want to share across components
+state: {
+// Initialize isLoggedIn from localStorage to persist login status across page refreshes
+isLoggedIn: !!localStorage.getItem('token')
+},
+// Mutations are functions that directly mutate the state.
+// Each mutation handler gets the entire state tree as the first argument.
+mutations: {
+// Mutation to set isLoggedIn to true
+LOGIN(state) {
+state.isLoggedIn = true
+},
+// Mutation to set isLoggedIn to false
+LOGOUT(state) {
+state.isLoggedIn = false
+}
+},
+// Actions are functions that cause side effects and can involve
+// asynchronous operations. Actions can also commit mutations.
+actions: {
+// Login action that commits LOGIN mutation
+login({ commit }) {
+// login logic here, then:
+commit('LOGIN')
+},
+// Logout action that commits LOGOUT mutation and dispatches navigateToLogin action
+logout({ commit, dispatch }) {
+commit('LOGOUT');
+dispatch('navigateToLogin');
+},
+// Action to navigate to login route using Vue Router
+navigateToLogin() {
+router.push({ name: 'Login' });
+}
+}
+})
+JavaScript
+
+The store.js file starts by importing createStore from vuex and router from the router.js file. createStore is a function that’s used to create a new Vuex store, and the router is used to control routing in certain actions.
+
+The createStore function is called with an object that defines the state, mutations, and actions for the Vuex store.
+
+The state object contains all the reactive data that you want to share across components. In this case, there’s a single state variable isLoggedIn, which is initialized from localStorage to persist login status across page refreshes.
+
+mutations are functions that directly mutate the state. In this case, there are two mutation functions LOGIN and LOGOUT, which set isLoggedIn to true and false respectively.
+
+actions are functions that cause side effects and can involve asynchronous operations. Actions can also commit mutations. In this case, there are three actions defined: login, logout, and navigateToLogin. The login action commits the LOGIN mutation. The logout action commits the LOGOUT mutation and dispatches the navigateToLogin action. The navigateToLogin action uses the router to navigate to the login route.
+
+Step 7: Create a Navbar file
+Now we need to create a navbar vue file to navigate into the various routes we have created.
+
+src/components/Navbar.vue
+
+<template>
+<!-- Navigation bar -->
+<nav>
+<!-- Links for different routes. They are conditionally rendered based on the 'isLoggedIn' state. -->
+<router-link to="/" v-if="isLoggedIn">Product List</router-link> |
+<router-link to="/add-product" v-if="isLoggedIn">Add Product</router-link> |
+<router-link to="/login" v-if="!isLoggedIn">Login</router-link> |
+<router-link to="/register" v-if="!isLoggedIn">Register</router-link> |
+<!-- Logout button that calls 'logout' action when clicked -->
+<a href="#" @click="logout" v-if="isLoggedIn">Logout</a>
+</nav>
+</template>
+
+
+<script>
+import { mapState, mapActions } from 'vuex'
+
+
+export default {
+computed: {
+// Using Vuex helpers to map the 'isLoggedIn' state to a computed property
+...mapState(['isLoggedIn'])
+},
+methods: {
+// Using Vuex helpers to map the 'logout' action to a method
+...mapActions(['logout'])
+}
+}
+</script>
+JavaScript
+
+To make certain links hidden when the user is logged out, you can add a condition to check if the user is logged in using the isLoggedIn state from Vuex. I have used the v-if directive to conditionally render these links.
+In this updated version of your code, the “Product List” and “Add Product” links will only be visible when the user is logged in (v-if="isLoggedIn"), while the “Login” and “Register” links will only be visible when the user is not logged in (v-if="!isLoggedIn").
+In the script setup, mapState is a helper that creates computed properties that return the state values from the store, and mapActions is a helper that maps the store actions to methods in your component. The isLoggedIn property will now reactively update across your application when it changes in the store.
+we need to update the main.js as follows…
+Step 8: Update Main Js and App File
+`src/main.js`
+// Importing required modules and components
+import { createApp } from 'vue';
+import App from './App.vue';
+import store from './store'; // Vuex store
+import router from './router.js'; // Vue router
+
+
+// Creating a Vue application instance
+const app = createApp(App)
+
+
+// Registering Vuex store and Vue Router with the application
+app.use(store)
+app.use(router)
+
+
+// Mounting the application to an HTML element with id 'app'
+app.mount('#app')
+JavaScript
+
+Lastly, Update the app. vue file as follows…
+
+`src/App.vue`
+<template>
+<!-- Importing and using Navbar component -->
+<Navbar />
+<div id="app">
+<!-- Insertion point for views based on the current route -->
+<!-- When navigating to different URLs, different content will be displayed here -->
+<router-view/>
+</div>
+</template>
+
+
+<script>
+// Importing Navbar component
+import Navbar from './components/Navbar.vue';
+
+
+export default {
+// Registering Navbar component
+components: {
+Navbar,
+},
+// Name of the root component
+name: 'App',
+}
+</script>
+
+
+
+<style>
+#app {
+text-align: center;
+margin-top: 60px;
+}
+</style>
+JavaScript
+
+If you want to completely ignore ESLint in your Vue.js application, you can do so by editing your vue.config.js file. If you don’t have a vue.config.js file in the root of your project, create one.
+
+Add the following configuration to the vue.config.js file:
+
+module.exports = {
+    lintOnSave: false,
+};
+JavaScript
+
+Step 9: Add Product Component
+The Add product component is responsible for inserting products into our Laravel backend. I have commented out the code for better understanding.
+
+<template>
+<!-- Form for adding a product -->
+<!-- @submit.prevent="submitForm" prevents the default form submission and calls the 'submitForm' method instead -->
+<form @submit.prevent="submitForm" class="add-product-form">
+<!-- Input for the product name -->
+<!-- v-model="name" binds the input to the 'name' data property -->
+<input class="input-field" v-model="name" placeholder="Product Name" />
+<!-- Error message for the product name -->
+<!-- Displayed if 'errors.name' is truthy -->
+<p v-if="errors.name" class="error">{{ errors.name }}</p>
+
+
+<!-- Input for the product description -->
+<!-- v-model="description" binds the input to the 'description' data property -->
+<input class="input-field" v-model="description" placeholder="Product Description" />
+<!-- Error message for the product description -->
+<!-- Displayed if 'errors.description' is truthy -->
+<p v-if="errors.description" class="error">{{ errors.description }}</p>
+
+
+<!-- Input for the product price -->
+<!-- v-model="price" binds the input to the 'price' data property -->
+<input class="input-field" v-model="price" placeholder="Product Price" />
+<!-- Error message for the product price -->
+<!-- Displayed if 'errors.price' is truthy -->
+<p v-if="errors.price" class="error">{{ errors.price }}</p>
+
+
+<!-- Button for submitting the form -->
+<button type="submit" class="submit-button">Add Product</button>
+</form>
+</template>
+
+
+<script>
+// Importing the axios instance
+import axios from '@/axios';
+
+
+export default {
+// Component data
+data() {
+return {
+// Product details
+name: '',
+description: '',
+price: '',
+// Validation errors
+errors: {}
+};
+},
+methods: {
+// Validate the input fields
+validateInput() {
+// Errors object
+const errors = {};
+// Validate the product name
+if (!this.name) errors.name = 'Name is required';
+// Validate the product description
+if (!this.description) errors.description = 'Description is required';
+// Validate the product price
+if (!this.price || isNaN(this.price)) errors.price = 'Price is required and must be a number';
+return errors;
+},
+// Handle form submission
+async submitForm() {
+// Validate the input fields
+const errors = this.validateInput();
+// If there are validation errors, update the 'errors' data property and stop execution
+if (Object.keys(errors).length > 0) {
+this.errors = errors;
+return;
+}
+
+
+try {
+// Send a POST request to the API to add the product
+await axios.post('/products', {
+name: this.name,
+description: this.description,
+price: this.price
+});
+// If the request is successful, redirect to the product list
+this.$router.push('/');
+} catch (error) {
+// If an error occurs, log it to the console
+console.error("An error occurred while adding the product:", error);
+}
+}
+}
+};
+</script>
+
+
+
+
+
+
+<style scoped>
+.error {
+color: red;
+}
+.add-product-form {
+max-width: 400px;
+margin: 20px auto;
+padding: 20px;
+background-color: #f9f9f9;
+border-radius: 8px;
+}
+
+
+.input-field {
+display: block;
+width: 100%;
+margin: 10px 0;
+padding: 10px;
+font-size: 1em;
+}
+
+
+.submit-button {
+padding: 10px 20px;
+background-color: #4CAF50;
+color: white;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+}
+
+
+.submit-button:hover {
+background-color: #45a049;
+}
+</style>
+JavaScript
+
+Step 10: Product List Component
+The product list component is responsible for displaying all our products from the Laravel 10 API. The codes have comments.
+
+<template>
+<!-- Product list container -->
+<div class="product-list">
+<ul>
+<!-- Product list item -->
+<!-- Use Vue's 'v-for' directive to loop through the products array -->
+<li class="product-item" v-for="product in products" :key="product.id">
+<!-- Display the product name -->
+<span class="product-name">{{ product.name }}</span>
+
+<!-- Container for action links -->
+<div class="action-links">
+<!-- Link to edit the product -->
+<!-- Use Vue Router's 'router-link' component to create a navigation link -->
+<!-- Use Vue's 'v-bind' directive (shorthand ':') to bind the 'to' prop with route data -->
+<router-link class="edit-link" :to="{ name: 'EditProduct', params: { id: product.id } }">Edit</router-link>
+
+<!-- Link to view product details -->
+<router-link class="details-link" :to="{ name: 'ProductDetails', params: { id: product.id } }">View Details</router-link>
+
+<!-- Button to delete the product -->
+<!-- Use Vue's 'v-on' directive (shorthand '@') to bind the click event with the 'deleteProduct' method -->
+<button class="delete-button" @click="deleteProduct(product.id)">Delete</button>
+</div>
+</li>
+</ul>
+</div>
+</template>
+
+<script>
+import axios from '@/axios'; // Import the axios instance
+
+export default {
+// Component data
+data() {
+return {
+// Initialize products as an empty array
+products: []
+};
+},
+methods: {
+// Method to delete a product
+async deleteProduct(id) {
+try {
+// Make a DELETE request to the API
+await axios.delete(`/products/${id}`);
+
+// If the request is successful, filter the deleted product out of the products array
+this.products = this.products.filter(product => product.id !== id);
+} catch (error) {
+// If an error occurs, log it to the console
+console.error("An error occurred while deleting the product:", error);
+}
+}
+},
+// Lifecycle hook that is called after the instance has been created
+async created() {
+try {
+// When the component is created, fetch the products from the API
+const response = await axios.get('http://localhost:8000/api/products');
+// Update the products array with the data from the API
+this.products = response.data;
+} catch (error) {
+// If an error occurs, log it to the console
+console.error("An error occurred while fetching the products:", error);
+}
+}
+}
+</script>
+
+<style scoped>
+.product-list {
+max-width: 800px;
+margin: 0 auto;
+padding: 20px;
+background-color: #f9f9f9;
+border-radius: 8px;
+}
+
+.product-item {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 10px;
+margin: 8px 0;
+border-bottom: 1px solid #ddd;
+}
+
+.product-name {
+font-weight: bold;
+font-size: 1.1em;
+}
+
+.action-links {
+display: flex;
+align-items: center;
+}
+
+.edit-link, .details-link, .delete-button {
+margin: 0 8px;
+font-size: 0.9em;
+}
+
+.edit-link, .details-link {
+text-decoration: none;
+color: #337ab7;
+}
+
+.delete-button {
+padding: 5px 10px;
+background-color: #f44336;
+color: #fff;
+border: none;
+border-radius: 4px;
+}
+
+.delete-button:hover {
+background-color: #d32f2f;
+cursor: pointer;
+}
+</style>
+JavaScript
+
+Step 11: Edit Product Component
+This component will handle edits for our products.
+
+<template>
+<!-- The component markup -->
+<div class="edit-product">
+<!-- The form for editing a product. The 'submit' event is prevented and instead the 'submitForm' method is called -->
+<form @submit.prevent="submitForm" class="edit-product-form">
+<!-- Various input fields bound to product properties with error handling -->
+<input class="input-field" v-model="product.name" placeholder="Product Name" />
+<p v-if="errors.name" class="error">{{ errors.name }}</p>
+
+<input class="input-field" v-model="product.description" placeholder="Product Description" />
+<p v-if="errors.description" class="error">{{ errors.description }}</p>
+
+<input class="input-field" v-model="product.price" placeholder="Product Price" />
+<p v-if="errors.price" class="error">{{ errors.price }}</p>
+
+<!-- Submit button -->
+<button type="submit" class="submit-button">Update Product</button>
+</form>
+</div>
+</template>
+
+<script>
+import { ref, onMounted } from 'vue'; // Importing necessary functionalities from Vue 3 Composition API
+import { useRoute, useRouter } from 'vue-router'; // Importing routing functionalities
+import axios from '@/axios'; // Importing axios for making HTTP requests
+
+export default {
+setup() {
+// Creating a reactive reference to the product object and error messages
+const product = ref({ id: null, name: '', description: '', price: '' });
+const errors = ref({});
+
+// Getting the current route instance and extracting product id from it
+const route = useRoute();
+product.value.id = route.params.id;
+
+// Getting the router instance
+const router = useRouter();
+
+// Defining input validation function
+const validateInput = () => {
+const errorMessages = {};
+if (!product.value.name) errorMessages.name = 'Name is required';
+if (!product.value.description) errorMessages.description = 'Description is required';
+if (!product.value.price || isNaN(product.value.price)) errorMessages.price = 'Price is required and must be a number';
+return errorMessages;
+};
+
+// Defining form submission function
+const submitForm = async () => {
+const errorMessages = validateInput();
+if (Object.keys(errorMessages).length > 0) {
+errors.value = errorMessages;
+return;
+}
+
+// Sending updated product data to the server
+try {
+await axios.put(`/products/${product.value.id}`, product.value);
+// Upon successful update, redirecting to the Product List page
+router.push('/');
+} catch (error) {
+console.error("An error occurred while updating the product:", error);
+if (error.response && error.response.status === 422) {
+// Handling server-side validation errors
+errors.value = error.response.data.errors;
+}
+}
+};
+
+// Fetching product data from the server when the component is mounted
+onMounted(async () => {
+try {
+const response = await axios.get(`/products/${product.value.id}`);
+product.value.name = response.data.name;
+product.value.description = response.data.description;
+product.value.price = response.data.price;
+} catch (error) {
+console.error("An error occurred while fetching the product:", error);
+}
+});
+
+// Exposing the reactive references and methods to be used within the template
+return { product, submitForm, errors };
+}
+};
+</script>
+
+
+<style scoped>
+.error {
+color: red;
+}
+.edit-product {
+max-width: 400px;
+margin: 20px auto;
+padding: 20px;
+background-color: #f9f9f9;
+border-radius: 8px;
+}
+
+.input-field {
+display: block;
+width: 100%;
+margin: 10px 0;
+padding: 10px;
+font-size: 1em;
+}
+
+.submit-button {
+padding: 10px 20px;
+background-color: #FF9800;
+color: white;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+}
+
+.submit-button:hover {
+background-color: #e68a00;
+}
+</style>
+JavaScript
+
+Step 12: Product Details Component
+The product details component is responsible for showing a single product’s detail.
+
+<template>
+<!-- Product details container -->
+<!-- Use Vue's 'v-if' directive to render this container only if 'product' is truthy -->
+<div v-if="product" class="product-details">
+<!-- Display the product name -->
+<h2 class="product-title">{{ product.name }}</h2>
+<!-- Display the product description -->
+<p class="product-description">{{ product.description }}</p>
+<!-- Display the product price -->
+<p class="product-price">Price: ${{ product.price }}</p>
+</div>
+</template>
+
+<script>
+import axios from '@/axios'; // Import the axios instance
+
+export default {
+// Component data
+data() {
+return {
+// Initialize product as null
+product: null
+};
+},
+// Lifecycle hook that is called after the instance has been mounted
+async mounted() {
+// Get the product ID from the route params
+const productId = this.$route.params.id;
+try {
+// Make a GET request to the API to fetch the product data
+const response = await axios.get(`/products/${productId}`);
+// Update the product data with the data from the API
+this.product = response.data;
+} catch (error) {
+// If an error occurs, log it to the console
+console.error("An error occurred while fetching the product:", error);
+}
+}
+};
+</script>
+
+<style scoped>
+.product-details {
+max-width: 600px;
+margin: 20px auto;
+padding: 20px;
+background-color: #f9f9f9;
+border-radius: 8px;
+}
+
+.product-title {
+margin-bottom: 20px;
+font-size: 2em;
+}
+
+.product-description {
+font-size: 1.2em;
+}
+
+.product-price {
+margin-top: 20px;
+font-size: 1.2em;
+font-weight: bold;
+}
+</style>
+
+
+notes- 
+the axios.js file is a place where you keep the base url of the backend while the cors is the place you keep the base url for the front end
+
+the store.js help in state management in vuex. it can be access using $store
+
+the router.js helps in the router management, it can be accessed using $router
+
+the vue.config.js here you can control the eslint config
+
+the App.vue file is the master component
+the main.js entry point which connects to the index.html app id
